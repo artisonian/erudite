@@ -31,4 +31,6 @@ if (outfile) {
   return fs.writeFileSync(outfile, src, 'utf8');
 }
 
-erudite.exec(src, argv);
+erudite.exec(src, {
+  filename: filename
+});

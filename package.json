@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/artisonian/erudite",
   "dependencies": {
+    "lodash.defaults": "^2.4.1",
     "marked": "^0.3.2",
     "minimist": "^0.2.0"
   },

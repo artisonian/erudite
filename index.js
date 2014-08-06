@@ -1,5 +1,6 @@
 var os = require('os');
 var vm = require('vm');
+var defaults = require('lodash.defaults');
 var marked = require('marked');
 
 module.exports = erudite;
@@ -23,9 +24,11 @@ function parse (text) {
   return buf;
 }
 
-function exec (src, argv) {
+function exec (src, opts) {
   var ctx = vm.createContext(global);
-  ctx.__filename = argv._[0] || 'erudite';
+
+  opts = defaults(opts || {}, { filename: 'erudite' });
+  ctx.__filename = opts.filename;
   ctx.__dirname =  process.cwd();
   ctx.global = ctx.root = ctx.GLOBAL = ctx;
 
@@ -46,10 +49,12 @@ function exec (src, argv) {
   };
 
   vm.runInContext(src, ctx);
+
+  return ctx;
 }
 
-function erudite (text, argv) {
-  exec(parse(text), argv);
+function erudite (text, opts) {
+  return exec(parse(text), opts);
 }
 
 erudite.parse = parse;

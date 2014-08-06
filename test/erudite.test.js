@@ -20,6 +20,15 @@ testSpecs.forEach(function (testSpec) {
   });
 });
 
+test('executes parsed code', function (t) {
+  t.plan(2);
+
+  var src = '# Hello World\n\n```js\nvar foo = "bar";\nbaz = foo.toUpperCase();\n```';
+  var ctx = erudite(src);
+  t.equals(ctx.foo, 'bar');
+  t.equals(ctx.baz, 'BAR');
+});
+
 function resolve (filename) {
   return path.join(__dirname, 'fixtures', filename);
 }
