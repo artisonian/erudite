@@ -1,0 +1,33 @@
+{
+  "name": "erudite",
+  "version": "0.2.0",
+  "description": "A JavaScript equivalent to Literate CoffeeScript",
+  "preferGlobal": true,
+  "main": "./index.js",
+  "bin": "./bin/erudite",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artisonian/erudite.git"
+  },
+  "keywords": [
+    "literate",
+    "litjs",
+    "markdown"
+  ],
+  "author": "Leroy Campbell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/artisonian/erudite/issues"
+  },
+  "homepage": "https://github.com/artisonian/erudite",
+  "dependencies": {
+    "marked": "^0.3.2",
+    "minimist": "^0.2.0"
+  },
+  "devDependencies": {
+    "tape": "^2.14.0"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  }
+}
