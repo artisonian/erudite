@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-
+'use strict';
 var fs = require('fs');
-var path = require('path');
 
 var argv = require('minimist')(process.argv.slice(2));
 var erudite = require('..');
@@ -11,7 +10,8 @@ var usage = function () {
     'Usage: erudite [options] /path/to/filename',
     '',
     '  -h, --help     show this help text',
-    '  -o, --outfile  write to the given file path'
+    '  -o, --outfile  write to the given file path',
+    '      --jsx      preprocess with JSX (harmony)'
   ].join('\n');
   process.stdout.write(helpText + '\n\n');
 };
@@ -25,7 +25,9 @@ if (help || !fs.existsSync(filename)) {
   process.exit(1);
 }
 
-var src = erudite.parse(fs.readFileSync(filename, 'utf8'));
+var src = erudite.parse(fs.readFileSync(filename, 'utf8'), {
+  jsx: !!argv.jsx
+});
 
 if (outfile) {
   return fs.writeFileSync(outfile, src, 'utf8');
