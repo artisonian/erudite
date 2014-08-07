@@ -2,7 +2,9 @@
 'use strict';
 var fs = require('fs');
 
-var argv = require('minimist')(process.argv.slice(2), { boolean: ['jsx'] });
+var argv = require('minimist')(process.argv.slice(2), {
+  boolean: ['jsx', 'stdout']
+});
 var erudite = require('..');
 
 var usage = function () {
@@ -10,8 +12,9 @@ var usage = function () {
     'Usage: erudite [options] /path/to/filename',
     '',
     '  -h, --help     show this help text',
+    '      --jsx      preprocess with JSX (harmony)',
     '  -o, --outfile  write to the given file path',
-    '      --jsx      preprocess with JSX (harmony)'
+    '      --stdout   write to stdout (ignores --outfile)'
   ].join('\n');
   process.stdout.write(helpText + '\n\n');
 };
@@ -28,6 +31,10 @@ if (help || !fs.existsSync(filename)) {
 var src = erudite.parse(fs.readFileSync(filename, 'utf8'), {
   jsx: !!argv.jsx
 });
+
+if (argv.stdout) {
+  return process.stdout.write(src);
+}
 
 if (outfile) {
   return fs.writeFileSync(outfile, src, 'utf8');

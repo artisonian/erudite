@@ -14,8 +14,9 @@ npm install -g erudite
 Usage: erudite [options] /path/to/filename
 
   -h, --help     show this help text
-  -o, --outfile  write to the given file path
       --jsx      preprocess with JSX (harmony)
+  -o, --outfile  write to the given file path
+      --stdout   write to stdout (ignores -o)
 ```
 
 ## Module Usage
