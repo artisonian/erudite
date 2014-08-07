@@ -42,6 +42,21 @@ var source = erudite.parse(buf);
 erudite.exec(source, opts);
 ```
 
+### `erudite.parse(str, opts)`
+
+- `str` A string of Markdown text to process
+- `opts` A configuration object
+  - `jsx` (Optional) A boolean to toggle [JSX][] pre-processing (defaults to `false`)
+  - `eol` (Optional) The string to use to concatenate code blocks (defaults to `os.EOL`)
+
+### `erudite.exec(src, opts)`
+
+- `src` A string of JavaScript source code
+- `opts` A configuration object
+  - `filename` (Optional) The name of the source file (defaults to `erudite`)
+
+[jsx]: http://facebook.github.io/react/docs/jsx-in-depth.html
+
 ## License
 
 MIT
