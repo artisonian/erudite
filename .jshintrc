@@ -1,0 +1,17 @@
+{
+  "camelcase": true,
+  "eqeqeq": true,
+  "immed": true,
+  "latedef": "nofunc",
+  "newcap": true,
+  "noarg": true,
+  "noempty": true,
+  "nonew": true,
+  "undef": true,
+  "unused": true,
+  "strict": true,
+  "trailing": true,
+  "eqnull": true,
+  "globalstrict": true,
+  "node": true
+}

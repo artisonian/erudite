@@ -23,9 +23,11 @@
   "dependencies": {
     "lodash.defaults": "^2.4.1",
     "marked": "^0.3.2",
-    "minimist": "^0.2.0"
+    "minimist": "^0.2.0",
+    "react-tools": "^0.11.1"
   },
   "devDependencies": {
+    "multiline": "^0.3.4",
     "tape": "^2.14.0"
   },
   "scripts": {

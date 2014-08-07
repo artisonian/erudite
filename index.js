@@ -1,13 +1,17 @@
+'use strict';
+
 var os = require('os');
 var vm = require('vm');
 var defaults = require('lodash.defaults');
 var marked = require('marked');
+var reactTools = require('react-tools');
 
 module.exports = erudite;
 
-function parse (text) {
+function parse (text, opts) {
+  opts = defaults(opts || {}, { jsx: false, eol: os.EOL });
   var tokens = marked.lexer(text);
-  var SEPARATOR = os.EOL + os.EOL;
+  var SEPARATOR = opts.eol + opts.eol;
   var codeBlocks = [];
   var buf;
 
@@ -21,7 +25,7 @@ function parse (text) {
   codeBlocks.pop(); // remove trailing EOL adding from the while loop
   buf = Buffer.concat(codeBlocks);
 
-  return buf;
+  return opts.jsx ? reactTools.transform(buf.toString(), { harmony: true }) : buf;
 }
 
 function exec (src, opts) {
@@ -54,7 +58,7 @@ function exec (src, opts) {
 }
 
 function erudite (text, opts) {
-  return exec(parse(text), opts);
+  return exec(parse(text, opts), opts);
 }
 
 erudite.parse = parse;
