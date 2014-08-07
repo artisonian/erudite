@@ -2,7 +2,7 @@
 'use strict';
 var fs = require('fs');
 
-var argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2), { boolean: ['jsx'] });
 var erudite = require('..');
 
 var usage = function () {
