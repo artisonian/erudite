@@ -59,10 +59,10 @@ function parse (text, opts) {
 }
 
 // **exec** takes a string of JavaScript as `src`, and runs it through a new
-// [virtual machine context](http://nodejs.org/docs).
+// [virtual machine context](http://nodejs.org/api/vm.html).
 //
 // This was lifted almost verbatim from CoffeeScript's
-// [command.coffee](http://jashkenas.github.io/coffee-script/docs) source.
+// [source](http://coffeescript.org/documentation/docs/coffee-script.html).
 function exec (src, opts) {
   opts = defaults(opts || {}, { filename: 'erudite' });
 
