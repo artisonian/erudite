@@ -1,3 +1,8 @@
+// erudite
+// =======
+//
+// A tool that parses and executes JavaScript from Markdown, akin to
+// [Literate CoffeeScript](http://coffeescript.org/#literate).
 'use strict';
 
 var os = require('os');
@@ -6,15 +11,36 @@ var defaults = require('lodash.defaults');
 var marked = require('marked');
 var reactTools = require('react-tools');
 
+// API
+// ---
+
+// **erudite** both parses and executes Markdown `text`. It is the single API exposed
+// by the module, but the plumbing functions are attached to it for convenience.
+function erudite (text, opts) {
+  return exec(parse(text, opts), opts);
+}
+
+erudite.parse = parse;
+erudite.exec = exec;
+
 module.exports = erudite;
 
+// Plumbing
+// --------
+
+// **parse** takes in Markdown `text`, extracts all indented and fenced code blocks,
+// returns the code blocks (concatenated). You can optionally pass the code blocks
+// through the [JSX transformer](http://facebook.github.io/react/docs/jsx-in-depth.html).
 function parse (text, opts) {
   opts = defaults(opts || {}, { jsx: false, eol: os.EOL });
-  var tokens = marked.lexer(text);
+
   var SEPARATOR = opts.eol + opts.eol;
   var codeBlocks = [];
   var buf;
 
+  // Break the Markdown `text` into tokens.
+  var tokens = marked.lexer(text);
+  // Check each token, and push it unto an array if it is a code block.
   for (var i = 0; i < tokens.length; i++) {
     if (tokens[i].type === 'code') {
       codeBlocks.push(new Buffer(tokens[i].text));
@@ -23,19 +49,33 @@ function parse (text, opts) {
   }
 
   codeBlocks.pop(); // remove trailing EOL adding from the while loop
+
+  // Concatentate the code blocks.
   buf = Buffer.concat(codeBlocks);
 
+  // If `opts.jsx` is true, process the code blocks as JSX. Otherwise, return the
+  // concatenated code blocks as a `Buffer`.
   return opts.jsx ? reactTools.transform(buf.toString(), { harmony: true }) : buf;
 }
 
+// **exec** takes a string of JavaScript as `src`, and runs it through a new
+// [virtual machine context](http://nodejs.org/docs).
+//
+// This was lifted almost verbatim from CoffeeScript's
+// [command.coffee](http://jashkenas.github.io/coffee-script/docs) source.
 function exec (src, opts) {
+  opts = defaults(opts || {}, { filename: 'erudite' });
+
+  // Create a new execution context, using `global` for seed values.
   var ctx = vm.createContext(global);
 
-  opts = defaults(opts || {}, { filename: 'erudite' });
+  // Set up a few expected global variables.
   ctx.__filename = opts.filename;
   ctx.__dirname =  process.cwd();
   ctx.global = ctx.root = ctx.GLOBAL = ctx;
 
+  // Since `require` is undefined in the new context, re-create it to allow
+  // the evaluated `src` to import modules.
   var Module = require('module');
   var _module = ctx.module = new Module('eval');
   var _require = ctx.require = function (path) {
@@ -52,14 +92,9 @@ function exec (src, opts) {
     Module._resolveFilename(request, _module);
   };
 
+  // Evalute `src` in the new context.
   vm.runInContext(src, ctx);
 
+  // Return the modified context (useful for testing).
   return ctx;
 }
-
-function erudite (text, opts) {
-  return exec(parse(text, opts), opts);
-}
-
-erudite.parse = parse;
-erudite.exec = exec;

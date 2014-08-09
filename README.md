@@ -1,6 +1,6 @@
 # Erudite
 
-A JavaScript equivalent to [Literate CoffeeScript](http://coffeescript.org/#literate).
+A tool that parses and executes JavaScript from Markdown, akin to [Literate CoffeeScript](http://coffeescript.org/#literate). Check out the [annotated source](http://artisonian.github.io/erudite/docs/) or the docs below.
 
 ## Getting Started
 
@@ -19,7 +19,7 @@ Usage: erudite [options] /path/to/filename
       --stdout   write to stdout (ignores -o)
 ```
 
-## Module Usage
+## API Usage
 
 `erudite` exports a single function which parses and executes a given buffer of
 [Markdown](http://daringfireball.net/projects/markdown) text:
@@ -29,9 +29,9 @@ var fs = require('fs');
 var erudite = require('erudite');
 
 var filename = './literate-javascript.md';
-var src = fs.readFileSync(filename, 'utf8');
+var text = fs.readFileSync(filename, 'utf8');
 
-erudite(src, {
+erudite(text, {
   filename: filename
 });
 ```
@@ -43,9 +43,9 @@ var source = erudite.parse(buf);
 erudite.exec(source, opts);
 ```
 
-### `erudite.parse(str, opts)`
+### `erudite.parse(text, opts)`
 
-- `str` A string of Markdown text to process
+- `text` A string of Markdown text to process
 - `opts` A configuration object
   - `jsx` (Optional) A boolean to toggle [JSX][] pre-processing (defaults to `false`)
   - `eol` (Optional) The string to use to concatenate code blocks (defaults to `os.EOL`)
