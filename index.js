@@ -35,18 +35,19 @@ function parse (text, opts) {
   opts = defaults(opts || {}, { jsx: false, eol: os.EOL });
 
   var SEPARATOR = opts.eol + opts.eol;
-  var codeBlocks = [];
   var buf;
 
   // Break the Markdown `text` into tokens.
   var tokens = marked.lexer(text);
   // Check each token, and push it unto an array if it is a code block.
-  for (var i = 0; i < tokens.length; i++) {
-    if (tokens[i].type === 'code') {
-      codeBlocks.push(new Buffer(tokens[i].text));
-      codeBlocks.push(new Buffer(SEPARATOR));
+  var codeBlocks = tokens.reduce(function (blocks, token) {
+    if (token.type === 'code') {
+      blocks.push(new Buffer(token.text));
+      blocks.push(new Buffer(SEPARATOR));
     }
-  }
+
+    return blocks;
+  }, []);
 
   codeBlocks.pop(); // remove trailing EOL adding from the while loop
 
