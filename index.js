@@ -7,9 +7,9 @@
 
 var os = require('os');
 var vm = require('vm');
-var defaults = require('lodash.defaults');
+var assign = require('object-assign');
 var marked = require('marked');
-var reactTools = require('react-tools');
+var babel = require('babel-core');
 
 // API
 // ---
@@ -29,10 +29,9 @@ module.exports = erudite;
 // --------
 
 // **parse** takes in Markdown `text`, extracts all indented and fenced code blocks,
-// returns the code blocks (concatenated). You can optionally pass the code blocks
-// through the [JSX transformer](http://facebook.github.io/react/docs/jsx-in-depth.html).
+// returns the code blocks (concatenated).
 function parse (text, opts) {
-  opts = defaults(opts || {}, { jsx: false, eol: os.EOL });
+  opts = assign({ eol: os.EOL }, opts);
 
   var SEPARATOR = opts.eol + opts.eol;
   var buf;
@@ -54,9 +53,8 @@ function parse (text, opts) {
   // Concatentate the code blocks.
   buf = Buffer.concat(codeBlocks);
 
-  // If `opts.jsx` is true, process the code blocks as JSX. Otherwise, return the
-  // concatenated code blocks as a `Buffer`.
-  return opts.jsx ? reactTools.transform(buf.toString(), { harmony: true }) : buf;
+  // Return the concatenated code blocks as a `Buffer`.
+  return new Buffer(babel.transform(buf.toString()).code);
 }
 
 // **exec** takes a string of JavaScript as `src`, and runs it through a new
@@ -65,7 +63,7 @@ function parse (text, opts) {
 // This was lifted almost verbatim from CoffeeScript's
 // [source](http://coffeescript.org/documentation/docs/coffee-script.html).
 function exec (src, opts) {
-  opts = defaults(opts || {}, { filename: 'erudite' });
+  opts = assign({ filename: 'erudite' }, opts);
 
   // Create a new execution context, using `global` for seed values.
   var ctx = vm.createContext(global);

@@ -22,7 +22,9 @@ test('parses indented code blocks', function (t) {
   */});
 
   var expected = m(function () {/*
-    var text = 'Lorem ipsum dolor, sit amet...';
+    "use strict";
+
+    var text = "Lorem ipsum dolor, sit amet...";
 
     console.log(text);
   */});
@@ -52,7 +54,9 @@ test('parses fenced code blocks', function (t) {
   */});
 
   var expected = m(function () {/*
-    function add (a, b) {
+    "use strict";
+
+    function add(a, b) {
       return a + b;
     }
 
@@ -98,9 +102,10 @@ test('parses mixed code blocks', function (t) {
   */});
 
   var expected = m(function () {/*
-    'use strict';
-    var fs = require('fs');
-    var stream = require('stream');
+    "use strict";
+
+    var fs = require("fs");
+    var stream = require("stream");
 
     var readStream = fs.createReadStream(__filename);
     var upcaseStream = new stream.Transform();
@@ -114,9 +119,7 @@ test('parses mixed code blocks', function (t) {
       done();
     };
 
-    readStream
-      .pipe(upcaseStream)
-      .pipe(stdoutStream);
+    readStream.pipe(upcaseStream).pipe(stdoutStream);
   */});
 
   t.equals(erudite.parse(src).toString(), expected);
@@ -125,56 +128,68 @@ test('parses mixed code blocks', function (t) {
 test('parses jsx code blocks', function (t) {
   t.plan(1);
 
-  // NOTE: can't use `multiline` here because of the `@jsx` pragma
-  var src = '# Erudite and JSX\n' +
-    '\n' +
-    '[React][] is a library by Facebook for building UIs. It features an optional\n' +
-    'HTML-like syntax called **JSX**. To use it, first declare the appropriate\n' +
-    'pragma in comments at the top of your file:\n' +
-    '\n' +
-    '    /** @jsx React.DOM */\n' +
-    '    var React = require("react");\n' +
-    '\n' +
-    'Then, declare a _component_:\n' +
-    '\n' +
-    '    var Panel = module.exports = React.createClass({\n' +
-    '      render: function () {\n' +
-    '        return (\n' +
-    '          <div className="panel panel-default">\n' +
-    '            <div className="panel-heading">\n' +
-    '              <h3 className="panel-title">{this.props.title}</h3>\n' +
-    '            </div>\n' +
-    '            <div className="panel-body">\n' +
-    '              {this.props.children}\n' +
-    '            </div>\n' +
-    '          </div>\n' +
-    '        )\n' +
-    '      }\n' +
-    '    });\n' +
-    '\n' +
-    '**That\'s it!** It\'s just that simple.\n' +
-    '\n' +
-    '[react]: http://facebook.github.io/react';
+  var src = m(function () {/*
+    # Erudite and JSX
 
-  var expected = '/** @jsx React.DOM */\n' +
-    'var React = require("react");\n' +
-    '\n' +
-    'var Panel = module.exports = React.createClass({displayName: \'exports\',\n' +
-    '  render: function () {\n' +
-    '    return (\n' +
-    '      React.DOM.div({className: "panel panel-default"}, \n' +
-    '        React.DOM.div({className: "panel-heading"}, \n' +
-    '          React.DOM.h3({className: "panel-title"}, this.props.title)\n' +
-    '        ), \n' +
-    '        React.DOM.div({className: "panel-body"}, \n' +
-    '          this.props.children\n' +
-    '        )\n' +
-    '      )\n' +
-    '    )\n' +
-    '  }\n' +
-    '});';
+    [React][] is a library by Facebook for building UIs. It features an optional
+    HTML-like syntax called **JSX**:
 
-  t.equals(erudite.parse(src, { jsx: true }).toString(), expected);
+        var React = require("react");
+
+    Then, declare a _component_:
+
+        var Panel = module.exports = React.createClass({
+          render() {
+            return (
+              <div className="panel panel-default">
+                <div className="panel-heading">
+                  <h3 className="panel-title">{this.props.title}</h3>
+                </div>
+                <div className="panel-body">
+                  {this.props.children}
+                </div>
+              </div>
+            )
+          }
+        });
+
+    **That's it!** It's just that simple.
+
+    [react]: http://facebook.github.io/react
+  */});
+
+  var expected = m(function () {/*
+    "use strict";
+
+    var React = require("react");
+
+    var Panel = module.exports = React.createClass({
+      displayName: "exports",
+
+      render: function render() {
+        return React.createElement(
+          "div",
+          { className: "panel panel-default" },
+          React.createElement(
+            "div",
+            { className: "panel-heading" },
+            React.createElement(
+              "h3",
+              { className: "panel-title" },
+              this.props.title
+            )
+          ),
+          React.createElement(
+            "div",
+            { className: "panel-body" },
+            this.props.children
+          )
+        );
+      }
+    });
+  */});
+
+  t.equals(erudite.parse(src).toString(), expected);
 });
 
 test('executes parsed code', function (t) {
@@ -193,4 +208,38 @@ test('executes parsed code', function (t) {
   var ctx = erudite(src);
   t.equals(ctx.foo, 'bar');
   t.equals(ctx.baz, 'BAR');
+});
+
+test('parses ES6 syntax', function (t) {
+  t.plan(2);
+
+  var src = m(function () {/*
+    # ES6
+
+    [Babel](babeljs.io) is a new JavaScript transpiler, featuring ES6/JSX support.
+
+        class Die {
+          constructor(n = 6) {
+            this._sides = n;
+          }
+
+          roll() {
+            return Math.random * this._sides + 1;
+          }
+
+          toString () {
+            return `[Die sides:${this._sides}]`;
+          }
+        }
+
+    Let's see the `Die` class in action:
+
+        var die = new Die(12);
+        var description = die.toString();
+        die.roll();
+  */});
+
+  var ctx = erudite(src);
+  t.ok(ctx.die instanceof ctx.Die);
+  t.equals(ctx.description, '[Die sides:12]');
 });

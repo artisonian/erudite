@@ -21,15 +21,15 @@
   },
   "homepage": "https://github.com/artisonian/erudite",
   "dependencies": {
-    "lodash.defaults": "^2.4.1",
-    "marked": "^0.3.2",
-    "minimist": "^0.2.0",
-    "react-tools": "^0.11.1"
+    "babel-core": "^4.7.3",
+    "marked": "^0.3.3",
+    "minimist": "^1.1.0",
+    "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "docco": "^0.6.3",
-    "multiline": "^0.3.4",
-    "tape": "^2.14.0"
+    "docco": "^0.7.0",
+    "multiline": "^1.0.2",
+    "tape": "^3.5.0"
   },
   "scripts": {
     "docs": "docco index.js",
