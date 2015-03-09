@@ -184,8 +184,10 @@ test('executes parsed code', function (t) {
     # Hello World
 
     ```js
+    var inspect = require('util').inspect;
     var foo = "bar";
     baz = foo.toUpperCase();
+    inspect(baz);
     ```
   */});
   var ctx = erudite(src);
