@@ -201,7 +201,7 @@ test('executes parsed code', function (t) {
     ```js
     var inspect = require('util').inspect;
     var foo = "bar";
-    baz = foo.toUpperCase();
+    var baz = foo.toUpperCase();
     inspect(baz);
     ```
   */});
