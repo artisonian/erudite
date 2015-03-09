@@ -12,7 +12,6 @@ var usage = function () {
     'Usage: erudite [options] /path/to/filename',
     '',
     '  -h, --help     show this help text',
-    '      --jsx      preprocess with JSX (harmony)',
     '  -o, --outfile  write to the given file path',
     '      --stdout   write to stdout (ignores --outfile)'
   ].join('\n');

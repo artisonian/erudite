@@ -29,7 +29,7 @@ module.exports = erudite;
 // --------
 
 // **parse** takes in Markdown `text`, extracts all indented and fenced code blocks,
-// returns the code blocks (concatenated).
+// returns the code blocks (concatenated; transpiled using [Babel](https://babeljs.io)).
 function parse (text, opts) {
   opts = assign({ eol: os.EOL }, opts);
 
@@ -82,7 +82,8 @@ function exec (src, opts) {
   };
   _module.filename = ctx.__filename;
   Object.getOwnPropertyNames(require).forEach(function (r) {
-    if (['paths', 'caller', 'callee', 'arguments', 'name', 'length'].indexOf(r) === -1) {
+    if (['paths', 'caller', 'callee',
+         'arguments', 'name', 'length'].indexOf(r) === -1) {
       _require[r] = require[r];
     }
   });

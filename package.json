@@ -12,7 +12,8 @@
   "keywords": [
     "literate",
     "litjs",
-    "markdown"
+    "markdown",
+    "es6"
   ],
   "author": "Leroy Campbell",
   "license": "MIT",
@@ -32,7 +33,7 @@
     "tape": "^3.5.0"
   },
   "scripts": {
-    "docs": "docco index.js",
+    "docs": "docco --layout linear index.js",
     "test": "tape test/*.js"
   }
 }
