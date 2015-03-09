@@ -84,7 +84,7 @@ function exec (src, opts) {
   };
   _module.filename = ctx.__filename;
   Object.getOwnPropertyNames(require).forEach(function (r) {
-    if (['paths', 'caller', 'callee', 'arguments'].indexOf(r) === -1) {
+    if (['paths', 'caller', 'callee', 'arguments', 'name', 'length'].indexOf(r) === -1) {
       _require[r] = require[r];
     }
   });
