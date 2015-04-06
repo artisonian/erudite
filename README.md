@@ -15,6 +15,7 @@ Usage: erudite [options] /path/to/filename
 
   -h, --help     show this help text
   -o, --outfile  write to the given file path
+  -e, --stage    ECMAScript proposal stage (0-4)
       --stdout   write to stdout (ignores -o)
 ```
 

@@ -31,7 +31,7 @@ module.exports = erudite;
 // **parse** takes in Markdown `text`, extracts all indented and fenced code blocks,
 // returns the code blocks (concatenated; transpiled using [Babel](https://babeljs.io)).
 function parse (text, opts) {
-  opts = assign({ eol: os.EOL }, opts);
+  opts = assign({ eol: os.EOL, stage: 2 }, opts);
 
   var SEPARATOR = opts.eol + opts.eol;
   var buf;
@@ -54,7 +54,7 @@ function parse (text, opts) {
   buf = Buffer.concat(codeBlocks);
 
   // Return the concatenated code blocks as a `Buffer`.
-  return new Buffer(babel.transform(buf.toString()).code);
+  return new Buffer(babel.transform(buf.toString(), { stage: opts.stage }).code);
 }
 
 // **exec** takes a string of JavaScript as `src`, and runs it through a new
@@ -91,6 +91,9 @@ function exec (src, opts) {
   _require.resolve = function (request) {
     Module._resolveFilename(request, _module);
   };
+
+  // Load Babel polyfill
+  _require('babel-core/polyfill');
 
   // Evalute `src` in the new context.
   vm.runInContext(src, ctx);

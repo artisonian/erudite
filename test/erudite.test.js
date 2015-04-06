@@ -223,7 +223,7 @@ test('parses ES6 syntax', function (t) {
           }
 
           roll() {
-            return Math.random * this._sides + 1;
+            return Math.random() * this._sides + 1;
           }
 
           toString () {
@@ -241,4 +241,74 @@ test('parses ES6 syntax', function (t) {
   var ctx = erudite(src);
   t.ok(ctx.die instanceof ctx.Die);
   t.equals(ctx.description, '[Die sides:12]');
+});
+
+test('includes Babel polyfill with executing', function (t) {
+  t.plan(1);
+
+  var src = m(function () {/*
+    # Object.assign
+
+    `Object.assign` is the standard way to extend objects.
+
+        let car = { make: 'Honda', model: 'Accord', year: 2015 };
+        Object.assign(car, { color: 'black' });
+  */});
+
+  var ctx = erudite(src);
+  t.equals(ctx.car.color, 'black');
+});
+
+test('parses ES6+ syntax (using TC39 stages)', function (t) {
+  t.plan(3);
+
+  var src = m(function () {/*
+    # JS Decorators
+
+    Future versions of JavaScript could include decorators to annotate/modify objects. To demonstrate,
+    let's use our `Die` class from above, but only allow a single roll.
+
+        class Die {
+          constructor(n = 6) {
+            this._sides = n;
+          }
+
+          @once
+          roll() {
+            return Math.random() * this._sides + 1;
+          }
+
+          toString () {
+            return `[Die sides:${this._sides}]`;
+          }
+        }
+
+    The `once` decorator ensures a function is only called once.
+
+        function once (target, name, descriptor) {
+          let fn = descriptor.value;
+          let called = false;
+
+          if (typeof fn === 'function') {
+            descriptor.value = function (...args) {
+              if (!called) {
+                called = true;
+                return fn.apply(this, args);
+              }
+            };
+          }
+
+          return descriptor;
+        }
+
+    Let's see the `Die` class in action:
+
+        let die = new Die(12);
+        let [first, second] = [die.roll(), die.roll()];
+  */});
+
+  var ctx = erudite(src, { stage: 1 });
+  t.ok(ctx.die instanceof ctx.Die);
+  t.equals(typeof ctx.first, 'number');
+  t.equals(typeof ctx.second, 'undefined');
 });
