@@ -22,9 +22,9 @@ test('parses indented code blocks', function (t) {
   */});
 
   var expected = m(function () {/*
-    "use strict";
+    'use strict';
 
-    var text = "Lorem ipsum dolor, sit amet...";
+    var text = 'Lorem ipsum dolor, sit amet...';
 
     console.log(text);
   */});
@@ -102,10 +102,9 @@ test('parses mixed code blocks', function (t) {
   */});
 
   var expected = m(function () {/*
-    "use strict";
-
-    var fs = require("fs");
-    var stream = require("stream");
+    'use strict';
+    var fs = require('fs');
+    var stream = require('stream');
 
     var readStream = fs.createReadStream(__filename);
     var upcaseStream = new stream.Transform();

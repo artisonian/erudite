@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/artisonian/erudite",
   "dependencies": {
-    "babel-core": "^4.7.3",
+    "babel-core": "^5.0.0",
     "marked": "^0.3.3",
     "minimist": "^1.1.0",
     "object-assign": "^2.0.0"
@@ -30,7 +30,7 @@
   "devDependencies": {
     "docco": "^0.7.0",
     "multiline": "^1.0.2",
-    "tape": "^3.5.0"
+    "tape": "^4.0.0"
   },
   "scripts": {
     "docs": "docco --layout linear index.js",
