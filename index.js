@@ -65,6 +65,9 @@ function parse (text, opts) {
 function exec (src, opts) {
   opts = assign({ filename: 'erudite' }, opts);
 
+  // Load Babel polyfill
+  require('babel-core/polyfill');
+
   // Create a new execution context, using `global` for seed values.
   var ctx = vm.createContext(global);
 
@@ -91,9 +94,6 @@ function exec (src, opts) {
   _require.resolve = function (request) {
     Module._resolveFilename(request, _module);
   };
-
-  // Load Babel polyfill
-  _require('babel-core/polyfill');
 
   // Evalute `src` in the new context.
   vm.runInContext(src, ctx);
