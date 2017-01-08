@@ -29,7 +29,7 @@ test('parses indented code blocks', function (t) {
     console.log(text);
   */});
 
-  t.equals(erudite.parse(src).toString(), expected);
+  t.equals(erudite.parse(src, { presets: ['es2015'] }).toString(), expected);
 });
 
 test('parses fenced code blocks', function (t) {
@@ -63,7 +63,7 @@ test('parses fenced code blocks', function (t) {
     console.log(add(2, 3));
   */});
 
-  t.equals(erudite.parse(src).toString(), expected);
+  t.equals(erudite.parse(src, { presets: ['es2015'] }).toString(), expected);
 });
 
 test('parses mixed code blocks', function (t) {
@@ -103,6 +103,7 @@ test('parses mixed code blocks', function (t) {
 
   var expected = m(function () {/*
     'use strict';
+
     var fs = require('fs');
     var stream = require('stream');
 
@@ -164,7 +165,6 @@ test('parses jsx code blocks', function (t) {
 
     var Panel = module.exports = React.createClass({
       displayName: "exports",
-
       render: function render() {
         return React.createElement(
           "div",
@@ -188,7 +188,7 @@ test('parses jsx code blocks', function (t) {
     });
   */});
 
-  t.equals(erudite.parse(src).toString(), expected);
+    t.equals(erudite.parse(src, { presets: ['es2015', 'react'] }).toString(), expected);
 });
 
 test('executes parsed code', function (t) {
@@ -238,7 +238,7 @@ test('parses ES6 syntax', function (t) {
         die.roll();
   */});
 
-  var ctx = erudite(src);
+  var ctx = erudite(src, { presets: ['es2015'] });
   t.ok(ctx.die instanceof ctx.Die);
   t.equals(ctx.description, '[Die sides:12]');
 });
@@ -255,7 +255,7 @@ test('includes Babel polyfill with executing', function (t) {
         Object.assign(car, { color: 'black' });
   */});
 
-  var ctx = erudite(src);
+  var ctx = erudite(src, { presets: ['es2015'] });
   t.equals(ctx.car.color, 'black');
 });
 
@@ -307,7 +307,9 @@ test('parses ES6+ syntax (using TC39 stages)', function (t) {
         let [first, second] = [die.roll(), die.roll()];
   */});
 
-  var ctx = erudite(src, { stage: 1 });
+  var ctx = erudite(src,
+                    { presets: ['es2015'],
+                      plugins: ['transform-decorators-legacy'] });
   t.ok(ctx.die instanceof ctx.Die);
   t.equals(typeof ctx.first, 'number');
   t.equals(typeof ctx.second, 'undefined');
