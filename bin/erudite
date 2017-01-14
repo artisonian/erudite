@@ -29,7 +29,7 @@ if (help || !fs.existsSync(filename)) {
 }
 
 var src = erudite.parse(fs.readFileSync(filename, 'utf8'), {
-  stage: argv.stage
+  stage: argv.e || argv.stage
 });
 
 if (argv.stdout) {
