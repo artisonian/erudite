@@ -7,24 +7,26 @@ var argv = require('minimist')(process.argv.slice(2), {
 });
 var erudite = require('..');
 
-var usage = function () {
-  var helpText = [
-    'Usage: erudite [options] /path/to/filename',
-    '',
-    '  -h, --help     show this help text',
-    '  -o, --outfile  write to the given file path',
-    '  -e, --stage    ECMAScript proposal stage (0-4)',
-    '      --stdout   write to stdout (ignores --outfile)'
-  ].join('\n');
-  process.stdout.write(helpText + '\n\n');
-};
+var usage = [
+  'Usage: erudite [options] /path/to/filename',
+  '',
+  '  -h, --help     show this help text',
+  '  -o, --outfile  write to the given file path',
+  '  -e, --stage    ECMAScript proposal stage (0-4)',
+  '      --stdout   write to stdout (ignores --outfile)'
+].join('\n') + '\n\n';
 
 var filename = argv._[0];
 var outfile = argv.o || argv.outfile;
 var help = argv.h || argv.help;
 
-if (help || !fs.existsSync(filename)) {
-  usage();
+if (help) {
+  process.stdout.write(usage);
+  process.exit(0);
+}
+
+if (!fs.existsSync(filename)) {
+  process.stderr.write(usage);
   process.exit(1);
 }
 
