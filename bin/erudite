@@ -10,11 +10,15 @@ var erudite = require('..');
 var usage = [
   'Usage: erudite [options] /path/to/filename',
   '',
+  'Options:',
   '  -h, --help     show this help text',
   '  -o, --outfile  write to the given file path',
-  '  -e, --stage    ECMAScript proposal stage (0-4)',
-  '      --stdout   write to stdout (ignores --outfile)'
-].join('\n') + '\n\n';
+  '  -e, --stage    set ECMAScript proposal stage (0-4)',
+  '  --preset       use given Babel preset (can be repeated)',
+  '  --stdout       write to stdout (ignores --outfile)',
+  '',
+  'NOTE: You must install Babel presets separately to use them.'
+].join('\n') + '\n';
 
 var filename = argv._[0];
 var outfile = argv.o || argv.outfile;
@@ -30,9 +34,14 @@ if (!fs.existsSync(filename)) {
   process.exit(1);
 }
 
-var src = erudite.parse(fs.readFileSync(filename, 'utf8'), {
-  stage: argv.e || argv.stage
-});
+// XXX Presets must be installed in the calling environment,
+// so do not enforce any
+var presets = argv.preset || [];
+if (typeof presets === 'string') presets = [presets];
+var opts = { presets: presets };
+var stagePreset = argv.e == null ? argv.stage : argv.e;
+if (stagePreset != null) opts.presets.push('stage-' + stagePreset);
+var src = erudite.parse(fs.readFileSync(filename, 'utf8'), opts);
 
 if (argv.stdout) {
   return process.stdout.write(src);

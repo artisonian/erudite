@@ -30,10 +30,14 @@ module.exports = erudite;
 
 // **parse** takes in Markdown `text`, extracts all indented and fenced code blocks,
 // returns the code blocks (concatenated; transpiled using [Babel](https://babeljs.io)).
-function parse (text, opts) {
-  opts = assign({ eol: os.EOL, stage: 2 }, opts);
+// Pass desired presets, plugins, and other [Babel options](https://babeljs.io/docs/core-packages/#options) in `opts`. No default presets etc are defined.
+ function parse (text, opts) {
+  opts = assign({ eol: os.EOL }, opts);
 
   var SEPARATOR = opts.eol + opts.eol;
+  // remove so that babel doesn't complain
+  delete opts.eol;
+
   var buf;
 
   // Break the Markdown `text` into tokens.
@@ -54,7 +58,7 @@ function parse (text, opts) {
   buf = Buffer.concat(codeBlocks);
 
   // Return the concatenated code blocks as a `Buffer`.
-  return new Buffer(babel.transform(buf.toString(), { stage: opts.stage }).code);
+  return new Buffer(babel.transform(buf.toString(), opts).code);
 }
 
 // **exec** takes a string of JavaScript as `src`, and runs it through a new
@@ -66,7 +70,7 @@ function exec (src, opts) {
   opts = assign({ filename: 'erudite' }, opts);
 
   // Load Babel polyfill
-  require('babel-core/polyfill');
+  require('babel-polyfill');
 
   // Create a new execution context, using `global` for seed values.
   var ctx = vm.createContext(global);
