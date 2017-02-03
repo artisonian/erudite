@@ -307,9 +307,10 @@ test('parses ES6+ syntax (using TC39 stages)', function (t) {
         let [first, second] = [die.roll(), die.roll()];
   */});
 
-  var ctx = erudite(src,
-                    { presets: ['es2015'],
-                      plugins: ['transform-decorators-legacy'] });
+  var ctx = erudite(src, {
+    presets: ['es2015'],
+    plugins: ['transform-decorators-legacy']
+  });
   t.ok(ctx.die instanceof ctx.Die);
   t.equals(typeof ctx.first, 'number');
   t.equals(typeof ctx.second, 'undefined');
