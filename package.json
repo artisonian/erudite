@@ -23,7 +23,6 @@
   "homepage": "https://github.com/artisonian/erudite",
   "dependencies": {
     "babel-core": "^6.21.0",
-    "babel-preset-env": "^1.1.6",
     "marked": "^0.3.6",
     "minimist": "^1.2.0",
     "object-assign": "^4.1.0"
