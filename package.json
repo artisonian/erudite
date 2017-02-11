@@ -1,6 +1,6 @@
 {
   "name": "erudite",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A JavaScript equivalent to Literate CoffeeScript",
   "preferGlobal": true,
   "main": "./index.js",
