@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Erudite Viewer</title>
+    <link rel="stylesheet" href="node_modules/github-markdown-css/github-markdown.css">
+    <link rel="stylesheet" href="node_modules/highlight.js/styles/github-gist.css">
+    <style>
+      * { box-sizing: border-box; }
+      html {
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
+        cursor: default;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #f2f2f2;
+        color: #333;
+      }
+      body {
+        display: flex;
+        flex-flow: column nowrap;
+      }
+      button {
+        cursor: default;
+      }
+      img {
+        -webkit-user-drag: none;
+      }
+      .top-nav {
+        display: flex;
+        justify-content: flex-start;
+        align-items: stretch;
+        flex: none;
+        width: 100%;
+        height: 40px;
+        padding-left: 80px;
+        border-bottom: 1px solid #e8e8e8;
+      }
+      .top-nav a {
+        height: 100%;
+        padding: 0 0.5rem;
+        line-height: 40px;
+      }
+      .top-nav a:hover {
+        color: #000;
+        cursor: normal;
+      }
+      .container {
+        flex: 1;
+        overflow-y: auto;
+        background: #fff;
+      }
+      .markdown-raw {
+        display: none;
+      }
+      .markdown-body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+        overflow-y: auto;
+      }
+      .script-output {
+        flex: none;
+        height: 10rem;
+        border-top: 1px solid #e8e8e8;
+        overflow-y: auto;
+        padding: 1rem 45px;
+      }
+      .script-output pre,
+      .script-output code {
+        font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        white-space: pre;
+      }
+      .script-output pre {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="top-nav">
+      <a class="js-openFile">Open</a>
+      <a class="js-reload">Reload</a>
+      <a class="js-showMarkdown">Markdown</a>
+      <a class="js-showCode">Code</a>
+    </nav>
+    <section class="container">
+      <div class="markdown-raw">
+        <pre><code class="language-md"></code></pre>
+      </div>
+      <div class="markdown-body"></div>
+    </section>
+    <section class="script-output"></section>
+    <script src="src/renderer.js"></script>
+  </body>
+</html>

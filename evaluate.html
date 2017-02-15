@@ -1,0 +1,8 @@
+<script>
+  const path = require('path');
+  const { ipcRenderer } = require('electron');
+  const { fileName } = JSON.parse(decodeURIComponent(window.location.hash.slice(1)));
+  console.debug('eval', { fileName, paths: require.main.paths });
+  const modulePath = path.join(path.dirname(fileName), 'node_modules');
+  require.main.paths.unshift(modulePath);
+</script>

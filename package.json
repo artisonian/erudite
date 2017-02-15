@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "description": "A JavaScript equivalent to Literate CoffeeScript",
   "preferGlobal": true,
-  "main": "./index.js",
+  "main": "main.js",
   "bin": "./bin/erudite",
   "repository": {
     "type": "git",
@@ -13,7 +13,8 @@
     "literate",
     "litjs",
     "markdown",
-    "es6"
+    "es6",
+    "electron"
   ],
   "author": "Leroy Campbell",
   "license": "MIT",
@@ -24,6 +25,9 @@
   "dependencies": {
     "babel-core": "^6.21.0",
     "babel-preset-env": "^1.1.6",
+    "commonmark": "^0.27.0",
+    "github-markdown-css": "^2.4.1",
+    "highlight.js": "^9.9.0",
     "marked": "^0.3.6",
     "minimist": "^1.2.0",
     "object-assign": "^4.1.0"
@@ -33,6 +37,7 @@
     "babel-polyfill": "^6.20.0",
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-react": "^6.16.0",
+    "devtron": "^1.4.0",
     "docco": "^0.7.0",
     "electron": "^1.4.15",
     "multiline": "^1.0.2",
@@ -40,6 +45,7 @@
   },
   "scripts": {
     "docs": "docco --layout linear index.js",
+    "start": "electron .",
     "test": "tape test/*.js"
   }
 }
