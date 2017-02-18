@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
+const watch = require('watch');
 const commonmark = require('commonmark');
 const hljs = require('highlight.js');
 const { ipcRenderer, webFrame } = require('electron');
@@ -8,6 +9,8 @@ const { ipcRenderer, webFrame } = require('electron');
 let file = null;
 let markdownBody = null;
 let codeBody = null;
+let monitor = null;
+let shouldWatch = true;
 
 document.body.classList.add(`platform-${process.platform}`);
 
@@ -18,9 +21,13 @@ document.querySelector('.js-openFile').addEventListener('click', () => {
 document.querySelector('.js-showMarkdown').addEventListener('click', showMarkdown);
 document.querySelector('.js-showCode').addEventListener('click', showCode);
 document.querySelector('.js-reload').addEventListener('click', () => {
-  if (file && codeBody) {
-    evalScript({ fileName: file, code: codeBody });
+  if (file) {
+    loadMarkdown(null, file);
   }
+});
+document.querySelector('.js-toggleWatch').addEventListener('click', (event) => {
+  shouldWatch = event.target.checked;
+  toggleWatch();
 });
 
 ipcRenderer.on('script-output', function (event, result) {
@@ -30,7 +37,9 @@ ipcRenderer.on('script-output', function (event, result) {
   el.innerHTML = `<pre><code>${output}</code></pre>`;
 });
 
-ipcRenderer.on('load-markdown', function (event, fileName) {
+ipcRenderer.on('load-markdown', loadMarkdown);
+
+function loadMarkdown (event, fileName) {
   console.debug('load-markdown', fileName);
 
   const reader = new commonmark.Parser();
@@ -66,8 +75,9 @@ ipcRenderer.on('load-markdown', function (event, fileName) {
       return { fileName, code: codeBody };
     })
     .then(evalScript)
+    .then(toggleWatch)
     .catch(err => console.error(err));
-});
+}
 
 function showMarkdown () {
   if (markdownBody) {
@@ -109,6 +119,42 @@ function readFileAsync (...args) {
 }
 
 function evalScript ({ fileName, code }) {
-  if (!code) throw new Error(`Could not parse code from file: ${fileName}`);
-  ipcRenderer.send('evaluate-script', { fileName, code });
+  if (code) {
+    ipcRenderer.send('evaluate-script', { fileName, code });
+  }
+}
+
+function startMonitoring (dir) {
+  if (monitor) {
+    stopMonitoring();
+  }
+
+  watch.createMonitor(dir, function (mon) {
+    monitor = mon;
+    mon.on('changed', (f) => {
+      if (file && file === f) {
+        console.debug('reloading file...');
+        loadMarkdown(null, file);
+      }
+    });
+    mon.on('removed', (f) => {
+      if (file && file === f) {
+        stopMonitoring();
+      }
+    });
+  });
+}
+
+function stopMonitoring () {
+  if (monitor) {
+    monitor.stop();
+  }
+}
+
+function toggleWatch () {
+  if (shouldWatch && file) {
+    startMonitoring(path.dirname(file));
+  } else {
+    stopMonitoring();
+  }
 }
