@@ -118,9 +118,29 @@ function readFileAsync (...args) {
   });
 }
 
+let scriptEl = null;
+let modulePath = null;
+
 function evalScript ({ fileName, code }) {
   if (code) {
-    ipcRenderer.send('evaluate-script', { fileName, code });
+    // ipcRenderer.send('evaluate-script', { fileName, code });
+
+    if (modulePath) {
+      require.main.paths.splice(0, 1);
+    }
+    modulePath = path.join(path.dirname(fileName), 'node_modules');
+    require.main.paths.unshift(modulePath);
+
+    if (document.body.contains(scriptEl)) {
+      document.body.removeChild(scriptEl);
+    }
+    scriptEl = document.createElement('script');
+    scriptEl.textContent = `
+      !function (__filename) {
+        ${code}
+      }('${fileName}');
+    `;
+    document.body.appendChild(scriptEl);
   }
 }
 
