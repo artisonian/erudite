@@ -1,6 +1,7 @@
 const path = require('path');
 const url = require('url');
 const { BrowserWindow, app, dialog, ipcMain } = require('electron');
+const storage = require('electron-json-storage');
 
 let mainWindow = null;
 
@@ -37,7 +38,15 @@ ipcMain.on('evaluate-script', (event, { fileName, code }) => {
 });
 
 app.on('ready', function () {
-  requestMarkdownFile().then(createWindow)
+  storage.get('last-opened', function (err, data) {
+    if (err) return console.error(err);
+
+    if (data.fileName) {
+      createWindow([data.fileName]);
+    } else {
+      requestMarkdownFile().then(createWindow);
+    }
+  });
 });
 
 app.on('window-all-closed', function () {
@@ -48,7 +57,15 @@ app.on('window-all-closed', function () {
 
 app.on('activate', function () {
   if (mainWindow == null) {
-    requestMarkdownFile().then(createWindow);
+    storage.get('last-opened', function (err, data) {
+      if (err) return console.error(err);
+
+      if (data.fileName) {
+        createWindow([data.fileName]);
+      } else {
+        requestMarkdownFile().then(createWindow);
+      }
+    });
   }
 });
 
@@ -59,7 +76,12 @@ function requestMarkdownFile () {
       { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }
     ]
   };
-  return showOpenDialogAsync(dialogOptions);
+  return showOpenDialogAsync(dialogOptions).then(([fileName]) => new Promise((resolve, reject) => {
+    storage.set('last-opened', { fileName }, function (err) {
+      if (err) return reject(err);
+      resolve([fileName]);
+    });
+  }));
 }
 
 function createWindow ([fileName]) {
