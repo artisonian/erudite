@@ -13,30 +13,6 @@ ipcMain.on('open-markdown-file', () => {
   }
 });
 
-ipcMain.on('evaluate-script', (event, { fileName, code }) => {
-  if (mainWindow) {
-    const win = new BrowserWindow({ show: false });
-    const evalUrl = url.format({
-      protocol: 'file',
-      slashes: true,
-      pathname: path.join(__dirname, 'evaluate.html'),
-      hash: encodeURIComponent(JSON.stringify({ fileName }))
-    });
-
-    win.webContents.on('did-finish-load', () => {
-      console.log('eval window loaded');
-      win.webContents.openDevTools();
-      win.webContents.executeJavaScript(code, false, result => {
-        console.log('eval result', result);
-        mainWindow.webContents.send('script-output', result);
-        console.log('closing eval window');
-        win.close();
-      });
-    });
-    win.loadURL(evalUrl);
-  }
-});
-
 app.on('ready', function () {
   storage.get('last-opened', function (err, data) {
     if (err) return console.error(err);

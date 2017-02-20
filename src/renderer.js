@@ -30,13 +30,6 @@ document.querySelector('.js-toggleWatch').addEventListener('click', (event) => {
   toggleWatch();
 });
 
-ipcRenderer.on('script-output', function (event, result) {
-  const output = typeof result === 'object' ? util.inspect(result, { depth: null }) : result;
-  const el = document.querySelector('.script-output');
-  console.debug('script-output', output);
-  el.innerHTML = `<pre><code>${output}</code></pre>`;
-});
-
 ipcRenderer.on('load-markdown', loadMarkdown);
 
 function loadMarkdown (event, fileName) {
@@ -123,8 +116,6 @@ let modulePath = null;
 
 function evalScript ({ fileName, code }) {
   if (code) {
-    // ipcRenderer.send('evaluate-script', { fileName, code });
-
     if (modulePath) {
       require.main.paths.splice(0, 1);
     }
