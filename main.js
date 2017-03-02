@@ -1,7 +1,9 @@
 const path = require('path');
 const url = require('url');
 const { BrowserWindow, app, dialog, ipcMain } = require('electron');
-const storage = require('electron-json-storage');
+const Configstore = require('configstore');
+const pkg = require('./package.json');
+const conf = new Configstore(pkg.name);
 
 require('electron-debug')({ showDevTools: true });
 
@@ -15,17 +17,7 @@ ipcMain.on('open-markdown-file', () => {
   }
 });
 
-app.on('ready', function () {
-  storage.get('last-opened', function (err, data) {
-    if (err) return console.error(err);
-
-    if (data.fileName) {
-      createWindow([data.fileName]);
-    } else {
-      requestMarkdownFile().then(createWindow);
-    }
-  });
-});
+app.on('ready', init);
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
@@ -35,15 +27,7 @@ app.on('window-all-closed', function () {
 
 app.on('activate', function () {
   if (mainWindow == null) {
-    storage.get('last-opened', function (err, data) {
-      if (err) return console.error(err);
-
-      if (data.fileName) {
-        createWindow([data.fileName]);
-      } else {
-        requestMarkdownFile().then(createWindow);
-      }
-    });
+    init();
   }
 });
 
@@ -54,12 +38,17 @@ function requestMarkdownFile () {
       { name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }
     ]
   };
-  return showOpenDialogAsync(dialogOptions).then(([fileName]) => new Promise((resolve, reject) => {
-    storage.set('last-opened', { fileName }, function (err) {
-      if (err) return reject(err);
-      resolve([fileName]);
-    });
-  }));
+  return showOpenDialogAsync(dialogOptions);
+}
+
+function init () {
+  const fileName = conf.get('file.lastOpened');
+
+  if (fileName) {
+    createWindow([fileName]);
+  } else {
+    requestMarkdownFile().then(createWindow);
+  }
 }
 
 function createWindow ([fileName]) {
@@ -78,6 +67,7 @@ function createWindow ([fileName]) {
 
   mainWindow.webContents.on('did-finish-load', function () {
     mainWindow.webContents.send('load-markdown', fileName);
+    conf.set('file.lastOpened', fileName);
   });
 
   mainWindow.on('closes', function () {
