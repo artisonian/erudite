@@ -3,6 +3,8 @@ const url = require('url');
 const { BrowserWindow, app, dialog, ipcMain } = require('electron');
 const storage = require('electron-json-storage');
 
+require('electron-debug')({ showDevTools: true });
+
 let mainWindow = null;
 
 ipcMain.on('open-markdown-file', () => {
@@ -73,7 +75,6 @@ function createWindow ([fileName]) {
   mainWindow.loadURL(path.join('file://', __dirname, 'index.html'));
 
   mainWindow.webContents.openDevTools();
-  require('devtron').install();
 
   mainWindow.webContents.on('did-finish-load', function () {
     mainWindow.webContents.send('load-markdown', fileName);

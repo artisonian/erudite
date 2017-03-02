@@ -26,6 +26,7 @@
     "babel-core": "^6.21.0",
     "babel-preset-env": "^1.1.6",
     "commonmark": "^0.27.0",
+    "electron-debug": "^1.1.0",
     "electron-json-storage": "^3.0.1",
     "github-markdown-css": "^2.4.1",
     "highlight.js": "^9.9.0",
@@ -42,11 +43,13 @@
     "devtron": "^1.4.0",
     "docco": "^0.7.0",
     "electron": "^1.4.15",
+    "electron-packager": "^8.5.2",
     "multiline": "^1.0.2",
     "tape": "^4.0.0"
   },
   "scripts": {
     "docs": "docco --layout linear index.js",
+    "pack": "electron-packager . --out dist --overwrite",
     "start": "electron .",
     "test": "tape test/*.js"
   }
