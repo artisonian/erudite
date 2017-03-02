@@ -6,11 +6,11 @@ const commonmark = require('commonmark');
 const hljs = require('highlight.js');
 const { ipcRenderer, webFrame } = require('electron');
 
-let file = null;
-let markdownBody = null;
-let codeBody = null;
-let monitor = null;
-let shouldWatch = true;
+let _fileName = null;
+let _markdown = null;
+let _code = null;
+let _monitor = null;
+let _autorun = true;
 
 document.body.classList.add(`platform-${process.platform}`);
 
@@ -21,19 +21,25 @@ document.querySelector('.js-openFile').addEventListener('click', () => {
 document.querySelector('.js-showMarkdown').addEventListener('click', showMarkdown);
 document.querySelector('.js-showCode').addEventListener('click', showCode);
 document.querySelector('.js-reload').addEventListener('click', () => {
-  if (file) {
-    loadMarkdown(null, file);
+  if (_fileName) {
+    loadMarkdown(null, _fileName);
   }
 });
-document.querySelector('.js-toggleWatch').addEventListener('click', (event) => {
-  shouldWatch = event.target.checked;
-  toggleWatch();
+document.querySelector('.js-toggleAutorun').addEventListener('click', (event) => {
+  _autorun = event.target.checked;
+  toggleAutorun();
+  // TODO: Re-run when autorun is enabled
 });
 
 ipcRenderer.on('load-markdown', loadMarkdown);
 
-function loadMarkdown (event, fileName) {
+function loadMarkdown (event, fileName, options) {
   console.debug('load-markdown', fileName);
+
+  if (options != null) {
+    _autorun = options.autorun;
+    document.querySelector('.js-toggleAutorun input').checked = _autorun;
+  }
 
   const reader = new commonmark.Parser();
   const writer = new commonmark.HtmlRenderer();
@@ -44,7 +50,7 @@ function loadMarkdown (event, fileName) {
       const parsed = reader.parse(text);
       const body = document.querySelector('.markdown-body');
 
-      markdownBody = writer.render(parsed);
+      _markdown = writer.render(parsed);
       showMarkdown();
 
       return { fileName, parsed };
@@ -63,19 +69,23 @@ function loadMarkdown (event, fileName) {
         }
       }
 
-      file = fileName;
-      codeBody = chunks.join('\n');
-      return { fileName, code: codeBody };
+      _fileName = fileName;
+      _code = chunks.join('\n');
+      return { fileName, code: _code };
     })
-    .then(evalScript)
-    .then(toggleWatch)
+    .then(args => {
+      if (_autorun) {
+        evalScript(args);
+      }
+    })
+    .then(toggleAutorun)
     .catch(err => console.error(err));
 }
 
 function showMarkdown () {
-  if (markdownBody) {
+  if (_markdown) {
     const body = document.querySelector('.markdown-body');
-    body.innerHTML = markdownBody;
+    body.innerHTML = _markdown;
     Array.from(body.querySelectorAll('pre code')).forEach(block => {
       hljs.highlightBlock(block);
     });
@@ -83,9 +93,9 @@ function showMarkdown () {
 }
 
 function showCode () {
-  if (codeBody) {
+  if (_code) {
     const body = document.querySelector('.markdown-body');
-    body.innerHTML = `<pre><code class="language-js">${codeBody}</code></pre>`;
+    body.innerHTML = `<pre><code class="language-js">${_code}</code></pre>`;
     Array.from(body.querySelectorAll('pre code')).forEach(block => {
       hljs.highlightBlock(block);
     });
@@ -136,20 +146,20 @@ function evalScript ({ fileName, code }) {
 }
 
 function startMonitoring (dir) {
-  if (monitor) {
+  if (_monitor) {
     stopMonitoring();
   }
 
   watch.createMonitor(dir, function (mon) {
-    monitor = mon;
+    _monitor = mon;
     mon.on('changed', (f) => {
-      if (file && file === f) {
+      if (_fileName && _fileName === f) {
         console.debug('reloading file...');
-        loadMarkdown(null, file);
+        loadMarkdown(null, _fileName);
       }
     });
     mon.on('removed', (f) => {
-      if (file && file === f) {
+      if (_fileName && _fileName === f) {
         stopMonitoring();
       }
     });
@@ -157,14 +167,14 @@ function startMonitoring (dir) {
 }
 
 function stopMonitoring () {
-  if (monitor) {
-    monitor.stop();
+  if (_monitor) {
+    _monitor.stop();
   }
 }
 
-function toggleWatch () {
-  if (shouldWatch && file) {
-    startMonitoring(path.dirname(file));
+function toggleAutorun () {
+  if (_autorun && _fileName) {
+    startMonitoring(path.dirname(_fileName));
   } else {
     stopMonitoring();
   }

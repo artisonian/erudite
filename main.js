@@ -4,6 +4,16 @@ const { BrowserWindow, app, dialog, ipcMain } = require('electron');
 const Configstore = require('configstore');
 const pkg = require('./package.json');
 const conf = new Configstore(pkg.name);
+const argv = require('minimist')(process.argv.slice(2), {
+  alias: {
+    c: 'clear',
+    o: 'open'
+  },
+  boolean: ['c', 'clear', 'auto-run'],
+  default: {
+    'auto-run': true
+  }
+});
 
 require('electron-debug')({ showDevTools: true });
 
@@ -13,6 +23,7 @@ ipcMain.on('open-markdown-file', () => {
   if (mainWindow) {
     requestMarkdownFile().then(([fileName]) => {
       mainWindow.webContents.send('load-markdown', fileName);
+      conf.set('file.lastOpened', fileName);
     });
   }
 });
@@ -42,7 +53,11 @@ function requestMarkdownFile () {
 }
 
 function init () {
-  const fileName = conf.get('file.lastOpened');
+  if (argv.clear) {
+    conf.delete('file.lastOpened');
+  }
+
+  const fileName = argv.open || conf.get('file.lastOpened');
 
   if (fileName) {
     createWindow([fileName]);
@@ -66,7 +81,7 @@ function createWindow ([fileName]) {
   mainWindow.webContents.openDevTools();
 
   mainWindow.webContents.on('did-finish-load', function () {
-    mainWindow.webContents.send('load-markdown', fileName);
+    mainWindow.webContents.send('load-markdown', fileName, { autorun: argv['auto-run'] });
     conf.set('file.lastOpened', fileName);
   });
 
