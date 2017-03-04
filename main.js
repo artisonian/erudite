@@ -71,8 +71,7 @@ function createWindow ([fileName]) {
     width: 960,
     minWidth: 640,
     height: 800,
-    backgroundColor: '#f2f2f2',
-    titleBarStyle: 'hidden-inset'
+    backgroundColor: '#fff'
   };
 
   mainWindow = new BrowserWindow(windowOptions);
