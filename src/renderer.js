@@ -17,7 +17,12 @@ document.body.classList.add(`platform-${process.platform}`);
 document.querySelector('.js-openFile').addEventListener('click', () => {
   ipcRenderer.send('open-markdown-file');
 }, false);
-
+document.querySelector('.js-saveCode').addEventListener('click', () => {
+  if (_code.trim()) {
+    const code = `!async function () {\n\n${_code.trim()}\n\n}();`;
+    ipcRenderer.send('save-code', { origFileName: _fileName, code });
+  }
+}, false);
 document.querySelector('.js-showMarkdown').addEventListener('click', showMarkdown);
 document.querySelector('.js-showCode').addEventListener('click', showCode);
 document.querySelector('.js-reload').addEventListener('click', () => {

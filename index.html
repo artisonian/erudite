@@ -14,6 +14,7 @@
       --c-mute: #e8e8e8;
       --c-fade: #757575;
       --c-accent: #09f;
+      --c-accent-dark: #06a;
     }
       * { box-sizing: border-box; }
       html {
@@ -63,19 +64,31 @@
       .top-nav a {
         display: flex;
         align-items: center;
+        color: var(--c-fade);
+        transition: color 0.3s cubic-bezier(0.23, 1, 0.320, 1);
       }
       .top-nav a:hover {
-        color: var(--c-dark);
+        color: var(--c-fg);
         cursor: normal;
       }
       .top-nav label {
         display: flex;
         align-items: center;
         margin-left: auto;
-        border-left: 1px solid var(--c-mute);
+      }
+      .top-nav .active {
+        color: var(--c-accent);
+      }
+      .top-nav .active:hover {
+        color: var(--c-accent-dark);
       }
       .top-nav label input[type="checkbox"] {
         margin-right: 0.5rem;
+      }
+      .top-nav__divider {
+        width: 1px;
+        background: var(--c-mute);
+        margin: 0 4px;
       }
       .container {
         flex: 1;
@@ -95,10 +108,13 @@
   </head>
   <body>
     <nav class="top-nav">
-      <a class="js-openFile" title="Open"><i class="material-icons">open_in_new</i></a>
-      <a class="js-reload" title="Reload"><i class="material-icons">refresh</i></a>
-      <a class="js-showMarkdown" title="Markdown"><i class="material-icons">text_fields</i></a>
-      <a class="js-showCode" title="Code"><i class="material-icons">code</i></a>
+      <a class="js-openFile" title="Open File"><i class="material-icons">launch</i></a>
+      <a class="js-saveCode" title="Save Code"><i class="material-icons">file_download</i></a>
+      <span class="top-nav__divider">&nbsp;</span>
+      <a class="js-showMarkdown active" title="Markdown View"><i class="material-icons">toc</i></a>
+      <a class="js-showCode" title="Code View"><i class="material-icons">code</i></a>
+      <span class="top-nav__divider">&nbsp;</span>
+      <a class="js-reload" title="Reload File"><i class="material-icons">refresh</i></a>
       <label class="js-toggleAutorun">
         <input type="checkbox" checked>
         Auto-run

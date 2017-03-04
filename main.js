@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const { BrowserWindow, app, dialog, ipcMain } = require('electron');
@@ -25,6 +26,20 @@ ipcMain.on('open-markdown-file', () => {
       mainWindow.webContents.send('load-markdown', fileName);
       conf.set('file.lastOpened', fileName);
     });
+  }
+});
+
+ipcMain.on('save-code', (event, { origFileName, code }) => {
+  if (code) {
+    showSaveDialogAsync({ defaultPath: origFileName.replace(/(md|markdown|txt)$/, 'js') })
+      .then(fileName => {
+        if (fileName == null) {
+          console.log('save cancelled');
+          return Promise.resolve();
+        }
+        return writeFileAsync(fileName, code);
+      })
+      .catch(err => console.error(err));
   }
 });
 
@@ -92,5 +107,20 @@ function createWindow ([fileName]) {
 function showOpenDialogAsync (...args) {
   return new Promise(function (resolve, reject) {
     dialog.showOpenDialog(...args.concat(resolve));
+  });
+}
+
+function showSaveDialogAsync (...args) {
+  return new Promise(function (resolve, reject) {
+    dialog.showSaveDialog(...args.concat(resolve));
+  });
+}
+
+function writeFileAsync (...args) {
+  return new Promise(function (resolve, reject) {
+    fs.writeFile(...args, function (err) {
+      if (err) return reject(err);
+      resolve();
+    });
   });
 }
