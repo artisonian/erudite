@@ -137,7 +137,7 @@ function evalScript ({ fileName, code }) {
     }
     scriptEl = document.createElement('script');
     scriptEl.textContent = `
-      !function (__filename) {
+      !async function (__filename) {
         ${code}
       }('${fileName}');
     `;
