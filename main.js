@@ -22,10 +22,15 @@ let mainWindow = null;
 
 ipcMain.on('open-markdown-file', () => {
   if (mainWindow) {
-    requestMarkdownFile().then(([fileName]) => {
+    requestMarkdownFile().then(([fileName] = []) => {
+      if (!fileName) {
+        console.log('open cancelled');
+        return Promise.resolve();
+      }
       mainWindow.webContents.send('load-markdown', fileName);
       conf.set('file.lastOpened', fileName);
-    });
+    })
+    .catch(err => console.error(err));
   }
 });
 
@@ -68,6 +73,8 @@ function requestMarkdownFile () {
 }
 
 function init () {
+  console.log('argv', process.argv);
+
   if (argv.clear) {
     conf.delete('file.lastOpened');
   }
@@ -77,7 +84,9 @@ function init () {
   if (fileName) {
     createWindow([fileName]);
   } else {
-    requestMarkdownFile().then(createWindow);
+    requestMarkdownFile()
+      .then(createWindow)
+      .catch(err => console.error(err));
   }
 }
 

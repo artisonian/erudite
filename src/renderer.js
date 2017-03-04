@@ -14,23 +14,39 @@ let _autorun = true;
 
 document.body.classList.add(`platform-${process.platform}`);
 
-document.querySelector('.js-openFile').addEventListener('click', () => {
-  ipcRenderer.send('open-markdown-file');
-}, false);
-document.querySelector('.js-saveCode').addEventListener('click', () => {
+const ui = {
+  openFile: document.querySelector('.js-openFile'),
+  saveCode: document.querySelector('.js-saveCode'),
+  showMarkdown: document.querySelector('.js-showMarkdown'),
+  showCode: document.querySelector('.js-showCode'),
+  reload: document.querySelector('.js-reload'),
+  toggleAutorun: document.querySelector('.js-toggleAutorun'),
+  markdownBody: document.querySelector('.markdown-body')
+};
+
+ui.openFile.addEventListener('click', () => ipcRenderer.send('open-markdown-file'));
+ui.saveCode.addEventListener('click', () => {
   if (_code.trim()) {
     const code = `!async function () {\n\n${_code.trim()}\n\n}();`;
     ipcRenderer.send('save-code', { origFileName: _fileName, code });
   }
-}, false);
-document.querySelector('.js-showMarkdown').addEventListener('click', showMarkdown);
-document.querySelector('.js-showCode').addEventListener('click', showCode);
-document.querySelector('.js-reload').addEventListener('click', () => {
+});
+ui.showMarkdown.addEventListener('click', () => {
+  ui.showCode.classList.remove('active');
+  showMarkdown();
+  ui.showMarkdown.classList.add('active');
+});
+ui.showCode.addEventListener('click', () => {
+  ui.showMarkdown.classList.remove('active');
+  showCode();
+  ui.showCode.classList.add('active');
+});
+ui.reload.addEventListener('click', () => {
   if (_fileName) {
     loadMarkdown(null, _fileName);
   }
 });
-document.querySelector('.js-toggleAutorun').addEventListener('click', (event) => {
+ui.toggleAutorun.addEventListener('click', (event) => {
   _autorun = event.target.checked;
   toggleAutorun();
   // TODO: Re-run when autorun is enabled
@@ -43,7 +59,7 @@ function loadMarkdown (event, fileName, options) {
 
   if (options != null) {
     _autorun = options.autorun;
-    document.querySelector('.js-toggleAutorun input').checked = _autorun;
+    ui.toggleAutorun.querySelector('input').checked = _autorun;
   }
 
   const reader = new commonmark.Parser();
@@ -89,21 +105,21 @@ function loadMarkdown (event, fileName, options) {
 
 function showMarkdown () {
   if (_markdown) {
-    const body = document.querySelector('.markdown-body');
-    body.innerHTML = _markdown;
-    Array.from(body.querySelectorAll('pre code')).forEach(block => {
-      hljs.highlightBlock(block);
-    });
+    ui.markdownBody.innerHTML = _markdown;
+    highlight();
   }
 }
 
 function showCode () {
   if (_code) {
-    const body = document.querySelector('.markdown-body');
-    body.innerHTML = `<pre><code class="language-js">${_code}</code></pre>`;
-    Array.from(body.querySelectorAll('pre code')).forEach(block => {
-      hljs.highlightBlock(block);
-    });
+    ui.markdownBody.innerHTML = `<pre><code class="language-js">${_code}</code></pre>`;
+    highlight();
+  }
+}
+
+function highlight () {
+  for (let block of ui.markdownBody.querySelectorAll('pre code')) {
+    hljs.highlightBlock(block);
   }
 }
 
